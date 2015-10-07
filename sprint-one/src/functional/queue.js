@@ -8,6 +8,8 @@ var Queue = function() {
   var length = 0  
 
   someInstance.enqueue = function(value) {
+    length++;
+    storage[length] = value;
   };
 
   someInstance.dequeue = function() {
