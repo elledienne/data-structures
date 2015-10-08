@@ -2,7 +2,7 @@
 var uniqueID = function() {
   var count = 0;
   return function() {
-    count ++;
+    count++;
     return count;
   }
 }
@@ -23,7 +23,8 @@ var Graph = function(value) {
 Graph.prototype.addNode = function(node) {
   var newGraph = new Graph(node);
 
-  this.addEdge(this, newGraph)
+  this.connections.push(newGraph);
+  newGraph.connections.push(this);
 };
 
 // ------------------------
@@ -33,7 +34,6 @@ Graph.prototype.contains = function(node, returnNode) {
 
   var lookupNodes = function(item){
     //item = item || this;
-    console.log(item)
     if(checkedID.indexOf(item.id) === -1){
       checkedID.push(item.id);
       if(item.value === node){
@@ -43,7 +43,7 @@ Graph.prototype.contains = function(node, returnNode) {
         for(var i = 0; i < item.connections.length; i++){
           isFound = lookupNodes(item.connections[i]);
           if(isFound){
-            return item;
+            return isFound;
           }
         }
       }
@@ -53,6 +53,7 @@ Graph.prototype.contains = function(node, returnNode) {
 
   var result = lookupNodes(this);
   if(returnNode){
+    console.log(result, "result")
     return result;
   }
   return !!result;
@@ -62,9 +63,6 @@ Graph.prototype.contains = function(node, returnNode) {
 // Removes a node from the graph.
 Graph.prototype.removeNode = function(node) {
   var nodeToRemove = this.contains(node, true);
-  if (nodeToRemove.connections === undefined) {
-    debugger;
-  }
   for (var i = 0; i < nodeToRemove.connections.length; i++) {
     this.removeEdge(nodeToRemove, nodeToRemove.connections[i]);
   }
@@ -73,13 +71,24 @@ Graph.prototype.removeNode = function(node) {
 // ------------------------
 // Returns a boolean indicating whether two specified nodes are connected.  Pass in the values contained in each of the two nodes.
 Graph.prototype.hasEdge = function(fromNode, toNode) {
+  var node1 = this.contains(fromNode, true);
+  var node2 = this.contains(toNode, true);
+  if (node1.connections.indexOf(node2) !== -1 && node2.connections.indexOf(node1) !== -1) {
+    return true;
+  }
+  return false;
 };
 
 // ------------------------
 // Connects two nodes in a graph by adding an edge between them.
 Graph.prototype.addEdge = function(fromNode, toNode) {
-  fromNode.connections.push(toNode);
-  toNode.connections.push(fromNode);
+  var node1 = this.contains(fromNode, true);
+  var node2 = this.contains(toNode, true);
+  console.log(fromNode, node1);
+
+  node1.connections.push(node2);
+
+  node2.connections.push(node1);
 };
 
 // ------------------------
@@ -94,6 +103,21 @@ Graph.prototype.removeEdge = function(fromNode, toNode) {
 // ------------------------
 // Pass in a callback which will be executed on each node of the graph.
 Graph.prototype.forEachNode = function(cb) {
+  var checkedID = []
+
+  var lookupNodes = function(item, callback){
+    //item = item || this;
+    if(checkedID.indexOf(item.id) === -1){
+      checkedID.push(item.id);
+      callback(item.value);
+      for (var i = 0; i < item.connections.length; i++) {
+        lookupNodes(item.connections[i], callback);
+      }
+    }
+    return;
+  }
+
+  lookupNodes(this, cb);
 };
 
 /*
