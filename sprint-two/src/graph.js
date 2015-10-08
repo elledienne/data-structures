@@ -57,6 +57,14 @@ Graph.prototype.contains = function(node, returnNode) {
     return result;
   }
   return !!result;
+
+  // var result = false
+  // this.forEachNode(function(value) {
+  //   if (value === node) {
+  //     result = true;
+  //   }
+  // });
+  // return result;
 };
 
 // ------------------------
@@ -64,7 +72,7 @@ Graph.prototype.contains = function(node, returnNode) {
 Graph.prototype.removeNode = function(node) {
   var nodeToRemove = this.contains(node, true);
   for (var i = 0; i < nodeToRemove.connections.length; i++) {
-    this.removeEdge(nodeToRemove, nodeToRemove.connections[i]);
+    this.removeEdge(nodeToRemove.value, nodeToRemove.connections[i].value);
   }
 };
 
@@ -94,10 +102,16 @@ Graph.prototype.addEdge = function(fromNode, toNode) {
 // ------------------------
 // Remove an edge between any two specified (by value) nodes.
 Graph.prototype.removeEdge = function(fromNode, toNode) {
-  var firstConnection = fromNode.connections.indexOf(toNode);
-  fromNode.connections.splice(firstConnection, 1);
-  var secondConnection = toNode.connections.indexOf(fromNode);
-  toNode.connections.splice(secondConnection, 1);
+  var node1 = this.contains(fromNode, true);
+  var node2 = this.contains(toNode, true);
+  // console.log(node1.connections);
+  // if (node1.connections === undefined) {
+  //   debugger;
+  // }
+  var firstConnection = node1.connections.indexOf(node2);
+  node1.connections.splice(firstConnection, 1);
+  var secondConnection = node2.connections.indexOf(node1);
+  node2.connections.splice(secondConnection, 1);
 };
 
 // ------------------------
@@ -114,11 +128,36 @@ Graph.prototype.forEachNode = function(cb) {
         lookupNodes(item.connections[i], callback);
       }
     }
-    return;
   }
 
   lookupNodes(this, cb);
 };
+
+Graph.prototype.returnNode = function(node) {
+  var checkedID = []
+
+  var lookupNodes = function(item){
+    //item = item || this;
+    if(checkedID.indexOf(item.id) === -1){
+      checkedID.push(item.id);
+      if(item.value === node){
+        return item;
+      } else if(item.connections){
+        var isFound = false;
+        for(var i = 0; i < item.connections.length; i++){
+          isFound = lookupNodes(item.connections[i]);
+          if(isFound){
+            return isFound;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+
+
+}
 
 /*
  * Complexity: What is the time complexity of the above functions?
