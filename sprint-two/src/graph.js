@@ -2,12 +2,19 @@
 
 // ------------------------
 // Instantiate a new graph
-var Graph = function() {
+var Graph = function(value) {
+  this.connections = [];
+  this.value = value;
 };
 
 // ------------------------
 // Add a node to the graph, passing in the node's value.
 Graph.prototype.addNode = function(node) {
+  var newGraph = new Graph(node);
+
+  newGraph.connections.push(this);
+  console.log(newGraph)
+  this.connections.push(newGraph);
 };
 
 // ------------------------
