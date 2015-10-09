@@ -7,64 +7,55 @@ var HashTable = function() {
 
 HashTable.prototype.insert = function(k, v) {
   var index = getIndexBelowMaxForKey(k, this._limit);
-  var entry = this.makeEntry(k, v);
+  var entry = [k,v];
+  var bucket = this._storage[index]
 
-  if (!this._storage[index]) {
-    this._storage[index] = entry;
+  if (!bucket) {
+    this._storage[index] = [entry];
   } else {
-    var current = this._storage[index];
-    var hasChild = true;
-    while(hasChild){
-      if (current.key === k){
-        current.value = v;
+    for (var i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === k) {
+        this._storage[index][i][1] = v;
         return;
       }
-      if(current.next){
-        current = current.next;
-      } else {
-        hasChild = false;
-      }
     }
-    current.next = entry;
+    this._storage[index].push(entry);
   }
 };
 
 HashTable.prototype.retrieve = function(k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
+  var bucket = this._storage[index]
 
-  if (this._storage[index] === null) {
-    return null;
-  } else if (this._storage[index].next === null) {
-    return this._storage[index].value;
-  } else {
-    var current = this._storage[index];
-    while (current.key !== k) {
-      current = current.next;
+  if (bucket !== null) {
+    for (var i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === k) {
+        return bucket[i][1];
+      }
     }
-    return current.value;
   }
+  return null;
 };
 
 HashTable.prototype.remove = function(k) {
   var index = getIndexBelowMaxForKey(k, this._limit);
+  var bucket = this._storage[index];
 
-  if (this._storage[index].next === null) {
-    this._storage[index] = null;
-  } else if (this._storage[index].key === k) {
-    this._storage[index] = this._storage[index].next
-  } else {
-    var current = this._storage[index]
-    while (current.next.key !== k) {
-      current = current.next;
+  if (bucket !== null) {
+    var toRemove;
+    for (var i = 0; i < bucket.length; i++) {
+      if (bucket[i][0] === k) {
+        toRemove = i;
+        break;
+      }
     }
-    current.next = current.next.next
+    this._storage[index].splice(toRemove, 1);
   }
+  return null;
+
 };
 
-HashTable.prototype.makeEntry = function (k,v) {
-  var obj = { key : k, value : v, next : null }
-  return obj;
-}
+
 
 
 
