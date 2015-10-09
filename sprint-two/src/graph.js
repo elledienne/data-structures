@@ -1,4 +1,3 @@
-
 var uniqueID = function() {
   var count = 0;
   return function() {
@@ -31,46 +30,19 @@ Graph.prototype.addNode = function(node) {
 // Return a boolean value indicating if the value passed to contains is represented in the graph.
 Graph.prototype.contains = function(node, returnNode) {
   var checkedID = []
-
-  var lookupNodes = function(item){
-    //item = item || this;
-    if(checkedID.indexOf(item.id) === -1){
-      checkedID.push(item.id);
-      if(item.value === node){
-        return item;
-      } else if(item.connections){
-        var isFound = false;
-        for(var i = 0; i < item.connections.length; i++){
-          isFound = lookupNodes(item.connections[i]);
-          if(isFound){
-            return isFound;
-          }
-        }
-      }
+  var result = false
+  this.forEachNode(function(value) {
+    if (value === node) {
+      result = true;
     }
-    return false;
-  }
-
-  var result = lookupNodes(this);
-  if(returnNode){
-    console.log(result, "result")
-    return result;
-  }
-  return !!result;
-
-  // var result = false
-  // this.forEachNode(function(value) {
-  //   if (value === node) {
-  //     result = true;
-  //   }
-  // });
-  // return result;
+  });
+  return result;
 };
 
 // ------------------------
 // Removes a node from the graph.
 Graph.prototype.removeNode = function(node) {
-  var nodeToRemove = this.contains(node, true);
+  var nodeToRemove = this.returnNode(node);
   for (var i = 0; i < nodeToRemove.connections.length; i++) {
     this.removeEdge(nodeToRemove.value, nodeToRemove.connections[i].value);
   }
@@ -79,8 +51,8 @@ Graph.prototype.removeNode = function(node) {
 // ------------------------
 // Returns a boolean indicating whether two specified nodes are connected.  Pass in the values contained in each of the two nodes.
 Graph.prototype.hasEdge = function(fromNode, toNode) {
-  var node1 = this.contains(fromNode, true);
-  var node2 = this.contains(toNode, true);
+  var node1 = this.returnNode(fromNode);
+  var node2 = this.returnNode(toNode);
   if (node1.connections.indexOf(node2) !== -1 && node2.connections.indexOf(node1) !== -1) {
     return true;
   }
@@ -90,27 +62,20 @@ Graph.prototype.hasEdge = function(fromNode, toNode) {
 // ------------------------
 // Connects two nodes in a graph by adding an edge between them.
 Graph.prototype.addEdge = function(fromNode, toNode) {
-  var node1 = this.contains(fromNode, true);
-  var node2 = this.contains(toNode, true);
-  console.log(fromNode, node1);
-
+  var node1 = this.returnNode(fromNode);
+  var node2 = this.returnNode(toNode);
   node1.connections.push(node2);
-
   node2.connections.push(node1);
 };
 
 // ------------------------
 // Remove an edge between any two specified (by value) nodes.
 Graph.prototype.removeEdge = function(fromNode, toNode) {
-  var node1 = this.contains(fromNode, true);
-  var node2 = this.contains(toNode, true);
-  // console.log(node1.connections);
-  // if (node1.connections === undefined) {
-  //   debugger;
-  // }
+  var node1 = this.returnNode(fromNode);
+  var node2 = this.returnNode(toNode);
   var firstConnection = node1.connections.indexOf(node2);
-  node1.connections.splice(firstConnection, 1);
   var secondConnection = node2.connections.indexOf(node1);
+  node1.connections.splice(firstConnection, 1);
   node2.connections.splice(secondConnection, 1);
 };
 
@@ -118,36 +83,31 @@ Graph.prototype.removeEdge = function(fromNode, toNode) {
 // Pass in a callback which will be executed on each node of the graph.
 Graph.prototype.forEachNode = function(cb) {
   var checkedID = []
-
-  var lookupNodes = function(item, callback){
-    //item = item || this;
-    if(checkedID.indexOf(item.id) === -1){
+  var travelNodes = function(item, callback) {
+    if (checkedID.indexOf(item.id) === -1) {
       checkedID.push(item.id);
       callback(item.value);
       for (var i = 0; i < item.connections.length; i++) {
-        lookupNodes(item.connections[i], callback);
+        travelNodes(item.connections[i], callback);
       }
     }
   }
-
-  lookupNodes(this, cb);
+  travelNodes(this, cb);
 };
 
 Graph.prototype.returnNode = function(node) {
   var checkedID = []
-
-  var lookupNodes = function(item){
-    //item = item || this;
-    if(checkedID.indexOf(item.id) === -1){
+  var findNode = function(item) {
+    if (checkedID.indexOf(item.id) === -1) {
       checkedID.push(item.id);
-      if(item.value === node){
+      if (item.value === node) {
         return item;
-      } else if(item.connections){
-        var isFound = false;
-        for(var i = 0; i < item.connections.length; i++){
-          isFound = lookupNodes(item.connections[i]);
-          if(isFound){
-            return isFound;
+      } else if (item.connections) {
+        var foundNode = false;
+        for (var i = 0; i < item.connections.length; i++) {
+          foundNode = findNode(item.connections[i]);
+          if (foundNode) {
+            return foundNode;
           }
         }
       }
@@ -155,12 +115,10 @@ Graph.prototype.returnNode = function(node) {
     return false;
   }
 
-
+  return findNode(this);
 
 }
 
 /*
  * Complexity: What is the time complexity of the above functions?
  */
-
-
