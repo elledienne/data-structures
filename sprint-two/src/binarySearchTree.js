@@ -23,7 +23,6 @@ var BinarySearchTree = function(value) {
 
 	binarySearchTree.contains = function(target, item) {
 		//base case
-		console.log(target, item)
 		var item = item || root;
 		if (item.value === target) {
 			return true;
@@ -38,7 +37,6 @@ var BinarySearchTree = function(value) {
 
 	binarySearchTree.depthFirstLog = function(callback, item) {
 		var item = item || root;
-		console.log(item, item.left);
 
 		callback(item.value);
 
