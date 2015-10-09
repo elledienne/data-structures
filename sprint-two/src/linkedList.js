@@ -8,7 +8,7 @@ var LinkedList = function() {
     //first item in list
     if (!list.head) {
       list.head = node;
-    // any subsequent item   
+      // any subsequent item   
     } else {
       list.tail.next = node;
     }
@@ -21,16 +21,29 @@ var LinkedList = function() {
     return toReturn;
   };
 
+  // list.contains = function(target, listItem) {
+  //   var listItem = listItem || list.head;
+  //   if (listItem.value === target) {
+  //     return true;
+  //   } else if (listItem.next === null) {
+  //     return false;
+  //   } else {
+  //     return (list.contains(target, listItem.next))
+  //   }
+  // };
+
   list.contains = function(target, listItem) {
     var listItem = listItem || list.head;
     if (listItem.value === target) {
       return true;
-    }
-    else if (listItem.next === null) {
+    } else {
+      while (listItem.next) {
+        listItem = listItem.next;
+        if (listItem.value === target) {
+          return true;
+        }
+      }
       return false;
-    }
-    else {
-      return (list.contains(target, listItem.next))
     }
   };
 
