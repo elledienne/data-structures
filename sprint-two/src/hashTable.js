@@ -58,19 +58,14 @@ HashTable.prototype.remove = function(k) {
     } else {
       this.checkToHalve(this._storage[index].length)
     }
-    // check to resize
-
   }
-  console.log(JSON.stringify(this._storage), "end of remove function")
   return null;
 
 
 };
 
 HashTable.prototype.checkToDouble = function(length) {
-  //console.log(length, this._limit)
   if ((length/this._limit)*100 >= 75) {
-    console.log('here');
     this._limit *= 2
     this.reshuffleEvents();
   }
@@ -82,20 +77,14 @@ HashTable.prototype.checkToHalve = function(length) {
   }
 }
 HashTable.prototype.reshuffleEvents = function() {
-  console.log(JSON.stringify(this._storage), "before shuffle");
   var backup = this._storage;
   backup = _.flatten(backup);
-  //console.log('backup', JSON.stringify(backup));
-  //console.log(backup, "backup flattened")
   this._storage = LimitedArray(this._limit);
   for( var i = 0; i < backup.length; i += 2){
-    //console.log(backup[i])
     if (typeof backup[i] !== "function") {
-      console.log(backup[i])
       this.insert(backup[i], backup[i+1]);
     }
   }
-  console.log(JSON.stringify(this._storage), "reshuffled");
 }
 
 
