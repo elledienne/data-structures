@@ -1,7 +1,8 @@
 var BloomFilter = function(length){
   this.set = [];
   this.length = length;
-  this.bitFilter = []
+  this.bitFilter = [];
+  this.count = 0;
   for (var i = 0; i < length; i++) {
     this.bitFilter.push(0);
   }
@@ -48,9 +49,14 @@ BloomFilter.prototype.totalHash = function(string, callback) {
 BloomFilter.prototype.insert = function(string) {
   this.set.push(string);
   this.totalHash(string, function(hash){
-    console.log(this);
-    this.bitFilter[hash] = 1;
+    if (this.bitFilter[hash] === 0) {
+      this.bitFilter[hash] = 1;
+      this.count++
+    }
   }.bind(this));
+  if ((this.count/this.length) >= .8) {
+    this.resize()
+  }
 }
 
 BloomFilter.prototype.lookup = function(string) {
@@ -61,13 +67,17 @@ BloomFilter.prototype.lookup = function(string) {
   }.bind(this));
 }
 
-// var test = new BloomFilter(14);
-// console.log(test);
-// test.insert("Lorenzo");
-// console.log(test);
-// console.log(test.lookup("Lorenzo"), test.lookup("Laura"));
-// test.insert('Laura');
-// console.log(test.lookup('Laura'));
-// test.insert('Pizza');
-// console.log(test.lookup('Pizza'));
+BloomFilter.prototype.resize = function() {
+  this.count = 0;
+  this.length *= 2;
+  this.bitFilter = [];
+  for (var i = 0; i < this.length; i++) {
+    this.bitFilter.push(0)
+  }
+
+  this.set.forEach(function(string) {
+    this.insert(string);
+  }.bind(this));
+
+}
 
