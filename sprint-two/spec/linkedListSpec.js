@@ -53,3 +53,20 @@ describe('linkedList', function() {
 
   // add more tests here to test the functionality of linkedList
 });
+
+describe("doublyLinkedList", function() {
+  it ("should be able to add to head", function() {
+    linkedList = DoublyLinkedList();
+    linkedList.addToHead(5);
+    expect(linkedList.contains(5)).to.equal(true);
+  });
+  it ("should be able to remove tail", function() {
+    linkedList = DoublyLinkedList();
+    linkedList.addToTail(9);
+    linkedList.addToTail(8);
+    linkedList.addToTail(12);
+    linkedList.removeTail();
+    expect(linkedList.tail.value).to.equal(8);
+
+  });
+});
